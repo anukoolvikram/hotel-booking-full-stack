@@ -18,8 +18,6 @@ const Header = () => {
   const [destination, setDestination] = useState<string>(search.destination);
   const [checkIn, setCheckIn] = useState<Date>(search.checkIn);
   const [checkOut, setCheckOut] = useState<Date>(search.checkOut);
-  const [adultCount, setAdultCount] = useState<number>(search.adultCount);
-  const [childCount, setChildCount] = useState<number>(search.childCount);
   const [rooms_to_book, setRoomsToBook] = useState<number>(search.rooms_to_book);
 
   const handleSubmit = (event: FormEvent) => {
@@ -28,8 +26,6 @@ const Header = () => {
       destination,
       checkIn,
       checkOut,
-      adultCount,
-      childCount,
       rooms_to_book,
     );
     navigate("/search");
@@ -41,15 +37,13 @@ const Header = () => {
 
   const handleClear = () => {
     setDestination('');
-    setAdultCount(0);
-    setChildCount(0);
     setRoomsToBook(1);
     setCheckIn(new Date());
     setCheckOut(new Date());
   };
     return (
       <div className="relative h-full w-full flex-col h-min-screen">
-        <div className="flex flex-col lg:flex-row dark:bg-slate-950 sm:pb-6 px-2">
+        <div className="flex flex-col lg:flex-row bg-slate-950 sm:pb-6 px-6 pt-6">
           {/* left section */}
           <section className="w-full lg:w-[60%] flex flex-col lg:translate-x-10 md:px-2 lg:px-0 lg:pt-16">
             <h1 className="text-3xl lg:text-5xl text-white font-extrabold py-1.5">LET'S GO!</h1>

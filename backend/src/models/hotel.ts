@@ -31,14 +31,15 @@ export type HotelType = {
   lastUpdated: Date;
   bookings: BookingType[];
   rooms_available:number;
+
 };
 
 const bookingSchema = new mongoose.Schema<BookingType>({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, required: true },
-  adultCount: { type: Number, required: true },
-  childCount: { type: Number, required: true },
+  adultCount: { type: Number, required: false },
+  childCount: { type: Number, required: false },
   checkIn: { type: Date, required: true },
   checkOut: { type: Date, required: true },
   userId: { type: String, required: true },

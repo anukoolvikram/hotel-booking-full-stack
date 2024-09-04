@@ -16,6 +16,7 @@ import Detail from "./pages/Detail";
 import Booking from "./pages/Booking";
 import MyBookings from "./pages/MyBookings";
 import Home from "./pages/Home";
+import PayNow from "./pages/PayNow";
 
 const App = () => {
   const { isLoggedIn } = useAppContext();
@@ -31,6 +32,7 @@ const App = () => {
         {isLoggedIn && (
           <> 
             <Route path="/hotel/:hotelId/booking" element={ <Layout> <Booking /> </Layout>}/>
+            <Route path='/paynow' element={<Layout><PayNow/></Layout>} />
             <Route path="/add-hotel" element={ <Layout> <AddHotel /> </Layout> }/>
             <Route path="/edit-hotel/:hotelId" element={ <Layout> <EditHotel /> </Layout>} />
             <Route path="/my-hotels" element={ <Layout> <MyHotels /> </Layout> } />

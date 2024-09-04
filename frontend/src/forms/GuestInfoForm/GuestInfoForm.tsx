@@ -38,21 +38,24 @@ const GuestInfoForm = ({ hotelId, pricePerNight }: Props) => {
     register,
     handleSubmit,
     setValue,
-    formState: { errors },
   } = useForm<GuestInfoFormData>({
     defaultValues: {
       checkIn: search.checkIn,
       checkOut: search.checkOut,
-      adultCount: search.adultCount,
-      childCount: search.childCount,
-      rooms_to_book:1,
+      rooms_to_book: 1,
     },
   });
 
   const checkIn = watch("checkIn");
   const checkOut = watch("checkOut");
 
-  const minDate = new Date();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Reset time to ensure accurate date comparison
+
+  const minCheckInDate = new Date(today);
+  const minCheckOutDate = checkIn ? new Date(checkIn) : new Date(today);
+  minCheckOutDate.setDate(minCheckOutDate.getDate() + 1); // Set checkout date to be at least one day after check-in or today
+
   const maxDate = new Date();
   maxDate.setFullYear(maxDate.getFullYear() + 1);
 
@@ -61,9 +64,7 @@ const GuestInfoForm = ({ hotelId, pricePerNight }: Props) => {
       "",
       data.checkIn,
       data.checkOut,
-      data.adultCount,
-      data.childCount,
-      data.rooms_to_book,
+      data.rooms_to_book
     );
     navigate("/sign-in", { state: { from: location } });
   };
@@ -73,23 +74,22 @@ const GuestInfoForm = ({ hotelId, pricePerNight }: Props) => {
       "",
       data.checkIn,
       data.checkOut,
-      data.adultCount,
-      data.childCount,
-      data.rooms_to_book,
+      data.rooms_to_book
     );
-    navigate(`/hotel/${hotelId}/booking`);
+    // navigate(`/hotel/${hotelId}/booking`);
+    navigate(`/paynow`);
   };
 
   return (
-    <div className="flex flex-col p-4 bg-blue-200 gap-4">
-      <h3 className="text-md font-bold">Rs {pricePerNight}</h3>
+    <div className="flex flex-col p-6 bg-blue-100 rounded-lg shadow-lg gap-6">
+      <h3 className="text-lg font-bold text-blue-900">Price Per Day: ₹ {pricePerNight}</h3>
       <form
-        onSubmit={
-          isLoggedIn ? handleSubmit(onSubmit) : handleSubmit(onSignInClick)
-        }
+        onSubmit={isLoggedIn ? handleSubmit(onSubmit) : handleSubmit(onSignInClick)}
+        className="space-y-6"
       >
-        <div className="grid grid-cols-1 gap-4 items-center">
-          <div>
+        <div className="flex flex-col sm:flex-row sm:space-x-4">
+          <div className="flex-1">
+            <label className="block text-blue-800 font-semibold mb-2">Check-in Date</label>
             <DatePicker
               required
               selected={checkIn}
@@ -97,85 +97,55 @@ const GuestInfoForm = ({ hotelId, pricePerNight }: Props) => {
               selectsStart
               startDate={checkIn}
               endDate={checkOut}
-              minDate={minDate}
+              minDate={minCheckInDate} // Check-in date must be greater than today
               maxDate={maxDate}
-              placeholderText="Check-in Date"
-              className="min-w-full bg-white p-2 focus:outline-none"
-              wrapperClassName="min-w-full"
+              dateFormat="dd-MM-yy"
+              placeholderText="Select your check-in date"
+              className="w-full bg-white p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div>
+          <div className="flex-1 mt-4 sm:mt-0">
+            <label className="block text-blue-800 font-semibold mb-2">Check-out Date</label>
             <DatePicker
               required
               selected={checkOut}
               onChange={(date) => setValue("checkOut", date as Date)}
-              selectsStart
+              selectsEnd
               startDate={checkIn}
               endDate={checkOut}
-              minDate={minDate}
+              minDate={minCheckOutDate} // Check-out date must be at least one day after today
               maxDate={maxDate}
-              placeholderText="Check-in Date"
-              className="min-w-full bg-white p-2 focus:outline-none"
-              wrapperClassName="min-w-full"
+              dateFormat="dd-MM-yy"
+              placeholderText="Select your check-out date"
+              className="w-full bg-white p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div className="flex bg-white px-2 py-1 gap-2">
-            <label className="items-center flex">
-              Adults:
-              <input
-                className="w-full p-1 focus:outline-none font-bold"
-                type="number"
-                min={1}
-                max={20}
-                {...register("adultCount", {
-                  required: "This field is required",
-                  min: {
-                    value: 1,
-                    message: "There must be at least one adult",
-                  },
-                  valueAsNumber: true,
-                })}
-              />
-            </label>
-            <label className="items-center flex">
-              Children:
-              <input
-                className="w-full p-1 focus:outline-none font-bold"
-                type="number"
-                min={0}
-                max={20}
-                {...register("childCount", {
-                  valueAsNumber: true,
-                })}
-              />
-            </label>
-            {errors.adultCount && (
-              <span className="text-red-500 font-semibold text-sm">
-                {errors.adultCount.message}
-              </span>
-            )}
-          </div >
-          <div className="flex bg-white px-2 py-1">
-          <label className="items-center flex">
-              Rooms:
-              <input
-                className="w-full p-1 focus:outline-none font-bold"
-                type="number"
-                min={0}
-                max={hotel?.rooms_available}
-                {...register("rooms_to_book", {
-                  valueAsNumber: true,
-                })}
-              />
-            </label>
+          <div className="flex-1 mt-4 sm:mt-0">
+            <label className="block text-blue-800 font-semibold mb-2">Rooms to Book</label>
+            <input
+              type="number"
+              min={1}
+              max={hotel?.rooms_available}
+              className="w-full bg-white p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold"
+              {...register("rooms_to_book", {
+                valueAsNumber: true,
+              })}
+            />
           </div>
-
+        </div>
+        <div>
           {isLoggedIn ? (
-            <button className="bg-blue-600 text-white h-full p-2 font-bold hover:bg-blue-500 text-xl">
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold text-xl hover:bg-blue-500 transition-colors"
+            >
               Book Now
             </button>
           ) : (
-            <button className="bg-blue-600 text-white h-full p-2 font-bold hover:bg-blue-500 text-xl">
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold text-xl hover:bg-blue-500 transition-colors"
+            >
               Sign in to Book
             </button>
           )}
